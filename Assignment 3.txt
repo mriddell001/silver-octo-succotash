@@ -1,0 +1,78 @@
+Programming Assignment - Serial Gaussian Elimination
+Due: Before Wednesday, April 26, 11pm.
+Grace period: Before Thursday, April 27, 11pm - 10 point deduction.
+No assignments will be accepted after the Grace period ends.
+
+This assignment is worth 100 points.
+
+70% Program correctness & clarity.
+20% Documentation
+See Programming Assignment Expectations.
+10% Timing information contributed.
+This is the first part of the last programming assignment - the second part will be to parallelize this code.
+Do not parallelize this version!
+
+Objectives:
+
+- Implement a serial version of Gaussian elimination with partial pivoting.
+- Gather empirical data on effect of compiler optimization levels.
+
+Description:
+
+- Write a linear solver in C using Gaussian elimination with partial pivoting.
+- The solver implementation should accept one argument - n, the size of the linear system - as a command line argument.
+- Allocate an n x n matrix A and an n-vector b (you may combine these if you wish) of double precision floating point variables.
+- IF (n < 5)
+  - read the augmented matrix for A | b from standard input, one row per line
+  - there will not be a vertical bar in the input
+  - e.g. for n=3
+    8 3 4 5
+    1 4 2 7
+    4 1 7 1
+- IF (n > 4)
+  - fill A | b with random numbers using the drand48  random number generator.
+  - drand48 returns a random double in the range [0, 1). It includes 0 but not 1
+  - Scale this result to the range [-1.0e6, 1.0e6).
+  - Make sure you seed the random number generator once using time.
+- Apply forward elimination with partial pivoting to transform the matrix into an upper triangular one, and then apply back substitution to compute x.
+- Once you have the solution x (and before doing any output), make a call to getrusage for RUSAGE_SELF, and print:
+  - user CPU time
+    convert timeval seconds plus microseconds to seconds
+    eg. 1 second plus 1 microsecond = 1.000001 seconds
+  - system CPU time
+    convert timeval seconds plus microseconds to seconds
+  - maximum resident set size
+  - minor page faults (soft - no I/O)
+  - major page faults (hard - I/O required)
+- IF (n < 5)
+  - print the original augmented matrix for A | b, one row per line (use %.10e)
+  - print x on one line (use %.10e)
+  - do not print the vertical bar | or any other extraneous characters
+  - e.g. for n=3 (not using %.10e in example)
+    8 3 4 5
+    1 4 2 7
+    4 1 7 1
+    0.01	1.81	-0.12
+- Compute the square root of the sum of the squares of the residual vector Ax-b.
+  - The sum is known as the l2-norm (or Euclidean norm)
+  - We use this to verify the correctness of our result.
+  - When computing the residual vector, you must use the original A and b (before forward elimination).
+  - If you use the A and b you generate via forward elimination then the residual vector will not reflect any errors introduced during forward elimination.
+- Print the value of the l2-norm of the residual - (use %.10e). It will be very small (<< 1) if your result is correct.
+- IMPORTANT - verify result vector and l2-norm computation by examining the output for a hand-crafted small system ( n < 5).
+- Once the code is working...
+  - compile with the Intel compiler and make your runs on a lab machine
+  - your code must compile without warnings or errors
+  - compile with three different optimization levels: -O1, -O2, -O3
+    (do not specify any other optimization-related options)
+  - run with problem size n = 8000
+  - make at least 3 runs at each optimization level, choose the smallest time to report on
+  - enter your three rows of timing information in this spreadsheet
+Turn-in Procedure
+
+- Create a zip file containing
+  - the source code
+  - Name the zip using your name as in jchallinger.zip.
+  - Submit the zip file in Bb Learn.
+  - Enter timing information in the spreadsheet.
+Failure to follow any of the instructions in this assignment will result in a grade deduction.
