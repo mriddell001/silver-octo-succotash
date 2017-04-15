@@ -10,6 +10,7 @@ Description - This implements a serial version of Gaussian elimination with
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 int main(int argc, char const *argv[]) {
   char ch;
@@ -25,15 +26,33 @@ int main(int argc, char const *argv[]) {
     }
   }
   else {
-    time_t t;
-    srand48(t);
+    srand48(time(0));
     for (int i = 0; i < m*n; i++) {
       *(matrix + i) = ((drand48() - 0.5)/0.5)*1000000;
     }
   }
-  for (int i = 0; i < n-1; i++) {
-    double divisor = *(matrix + n*i + i);
-    for (int j = i; j < n; j++) {
+  for (int i = 0; i < n-1; i++) { //For each matrix element along the diagonal.
+    double denominator = *(matrix + n*i + i);
+    if (denominator == 0.0) { //If any diagonal would cause a divide-by-zero issue.
+      for (int j = i+1; j < n-1; j++) { //In same column, find non-zero row.
+        if (*(matrix + j*n + i) != 0.0) {
+          for (int k = 0; k < n; k++) {
+            double tmp = *(matrix + i*n + k);
+            *(matrix + i*n + k) = *(matrix + j*n + k);
+            *(matrix + j*n + k) = tmp;
+          }
+          break;
+        }
+      }
+    }
+    denominator = *(matrix + n*i + i);
+    for (int j = i+1; j < n; j++) { //For each column in the row below diagonal.
+      double numerator = *(matrix + n*j + i);
+      for (int k = i; k < n; k++) { //For each element in the row.
+        double relim = *(matrix + n*i + k);
+        *(matrix + n*j + k) = *(matrix + n*j + k) - relim*numerator/denominator;
+      }
+      /*
       int l;
       double abs_max;
       for (int k = i+1; k < n-1; k++) {
@@ -47,6 +66,7 @@ int main(int argc, char const *argv[]) {
         //Swap rows.
       }
       //Gaussian elimination of row.
+      */
     }
   }
   return 0;
