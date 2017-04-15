@@ -13,16 +13,16 @@ Description - This implements a serial version of Gaussian elimination with
 #include <time.h>
 
 int main(int argc, char const *argv[]) {
-  char ch;
   int n = atoi(argv[1]);
   int m = n + 1;
   double *matrix = malloc (sizeof (double) * m * n);
   if (n < 5) {
-    for (size_t i = 0; i < m*n; i++) {
-      double tmp;
-      scanf("%lf", &tmp);
-      ch = getchar();
-      *(matrix + i) = tmp;
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        double tmp = 0.0;
+        scanf("%lf", &tmp);
+        *(matrix + i*m + j) = tmp;
+      }
     }
   }
   else {
@@ -31,43 +31,54 @@ int main(int argc, char const *argv[]) {
       *(matrix + i) = ((drand48() - 0.5)/0.5)*1000000;
     }
   }
+
+  printf("\n");
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      printf("%.10e", *(matrix + i*m + j));
+      if (j<m-1) {
+        printf(" ");
+      }
+    }
+    printf("\n");
+  }
+  printf("\n\n");
+
   for (int i = 0; i < n-1; i++) { //For each matrix element along the diagonal.
-    double denominator = *(matrix + n*i + i);
+    double denominator = *(matrix + i*n + i);
     if (denominator == 0.0) { //If any diagonal would cause a divide-by-zero issue.
       for (int j = i+1; j < n-1; j++) { //In same column, find non-zero row.
-        if (*(matrix + j*n + i) != 0.0) {
-          for (int k = 0; k < n; k++) {
-            double tmp = *(matrix + i*n + k);
-            *(matrix + i*n + k) = *(matrix + j*n + k);
-            *(matrix + j*n + k) = tmp;
+        if (*(matrix + j*m + i) != 0.0) {
+          for (int k = 0; k < m; k++) {
+            double tmp = *(matrix + i*m + k);
+            *(matrix + i*m + k) = *(matrix + j*m + k);
+            *(matrix + j*m + k) = tmp;
           }
           break;
         }
       }
     }
-    denominator = *(matrix + n*i + i);
-    for (int j = i+1; j < n; j++) { //For each column in the row below diagonal.
-      double numerator = *(matrix + n*j + i);
-      for (int k = i; k < n; k++) { //For each element in the row.
-        double relim = *(matrix + n*i + k);
-        *(matrix + n*j + k) = *(matrix + n*j + k) - relim*numerator/denominator;
-      }
-      /*
-      int l;
-      double abs_max;
-      for (int k = i+1; k < n-1; k++) {
-        if (k == i+1) {abs_max = fabs(*(matrix + k*n + j));l=k;}
-        else {
-          double abs_tmp = fabs(*(matrix + k*n + j));
-          if (abs_tmp > abs_max) {l=k;abs_max = abs_tmp;}
+    denominator = *(matrix + i*m + i);
+    if (denominator != 0.0) { //As long as at least one row had a non-zero value
+      for (int j = i+1; j < n; j++) { //For each column in the row below diagonal.
+        double numerator = *(matrix + j*m + i);
+        for (int k = i; k < m; k++) { //For each element in the row.
+          double relim = *(matrix + i*m + k);
+          *(matrix + j*m + k) = *(matrix + j*m + k) - relim*numerator/denominator;
         }
       }
-      if (l > i+1) {
-        //Swap rows.
-      }
-      //Gaussian elimination of row.
-      */
     }
+  }
+
+
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < m; j++) {
+      printf("%.10e", *(matrix + i*m + j));
+      if (j<m-1) {
+        printf(" ");
+      }
+    }
+    printf("\n");
   }
   return 0;
 }
