@@ -24,10 +24,10 @@
 #    -o           ==> specify the output filename
 #    -c           ==> compile only (create a .o file)
 sge: serial_gaussian_elimination.o
-	gcc -Wall -pedantic -g -o sge serial_gaussian_elimination.o
+	gcc -std=c99 -Wall -pedantic -g -o sge serial_gaussian_elimination.o
 
 serial_gaussian_elimination.o: serial_gaussian_elimination.c
-	gcc -Wall -pedantic -g -c serial_gaussian_elimination.c
+	gcc -std=c99 -Wall -pedantic -g -c serial_gaussian_elimination.c
 
 clean:
 	rm -f sge sge.exe serial_gaussian_elimination.o
