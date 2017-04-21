@@ -24,6 +24,7 @@ int main(int argc, char const *argv[]) {
   double *matrix = malloc (sizeof (double) * m * n);
   double *ortrix = malloc (sizeof (double) * m * n);
   double *answers = malloc (sizeof (double) *n);
+  double *average = malloc (sizeof (double) *n);
   if (n < 5) {
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < m; j++) {
@@ -31,6 +32,7 @@ int main(int argc, char const *argv[]) {
         scanf("%lf", &tmp);
         *(matrix + i*m + j) = tmp;
         *(ortrix + i*m + j) = tmp;
+        *(average + i) = *(average + i) + tmp/m;
       }
       *(answers + i) = 0.0;
     }
@@ -42,9 +44,17 @@ int main(int argc, char const *argv[]) {
       *(matrix + i) = tmp;
       *(ortrix + i) = tmp;
     }
+    for (int i = 0; i < n; i++) {
+      *(average + i) = 0.0;
+      *(answers + i) = 0.0;
+      for (int j = 0; j < m; j++) {
+        *(average + i) = *(average + i) + *(matrix + i*m + j)/m;
+      }
+    }
   }
 
   for (int i = 0; i < n-1; i++) { //For each matrix element along the diagonal.
+    //Check for scaling issue first.
     double multiplier = *(matrix + i*m + i);
     if (multiplier == 0.0) { //If any diagonal would cause a divide-by-zero issue.
       for (int j = i+1; j < n-1; j++) { //In same column, find non-zero row.
@@ -81,7 +91,8 @@ int main(int argc, char const *argv[]) {
         double multiplier = *(answers + j);
         right_side = right_side - element * multiplier;
       }
-      else {*(answers + i) = right_side / element;}
+      else {
+        *(answers + i) = right_side / element;}
     }
   }
   getrusage(RUSAGE_SELF, &ru);
@@ -99,6 +110,7 @@ int main(int argc, char const *argv[]) {
       }
       printf("\n");
     }
+    printf("answers:\n");
     for (int i = 0; i < n; i++) {
       printf("%.10e", *(answers + i));
       if (i < n+1) {
@@ -107,15 +119,24 @@ int main(int argc, char const *argv[]) {
     }
     printf("\n");
   }
-  /*
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < m; j++) {
-      printf("%.10e", *(matrix + i*m + j));
-      if (j<m-1) {
-        printf(" ");
-      }
+
+  double sum_sqrs = 0.0;
+  for (int i = 0; i < 1; i++) {
+    double b = *(ortrix + i*m + n);
+    for (int j = 0; j < n; j++) {
+      long double x = *(answers + (n-j-1));
+      printf("b: %.10e\t", b);
+      printf("x: %.10e\t", (double)x);
+      double A = *(ortrix + i*m + j);
+      printf("A: %.10e\n", A);
+      double Axb2 = ((double)x*A - b);
+      Axb2 = pow(Axb2, 2.0);
+      printf("Axb2: %.10e\n", sqrt(Axb2));
+      sum_sqrs = sum_sqrs + sqrt(Axb2);
+      printf("%.10e\n", (double)sum_sqrs);
     }
-    printf("\n");
-  }*/
+  }
+  printf("%.10e\n", (double)sum_sqrs);
+
   return 0;
 }
